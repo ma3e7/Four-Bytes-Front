@@ -9,7 +9,7 @@ export default function NavbarComponent({ openSignIn, openSignUp, isLoggedIn, re
 
     const handleLogout = () => {
         authService.logout();
-        refreshUser();  // ODMAH osvježi stanje u App.jsx
+        refreshUser();
     };
 
     return (

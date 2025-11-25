@@ -12,8 +12,8 @@ export default function SignInComponent({ closeModal, refreshUser }) {
 
         try {
             await authService.login(username, password);
-            refreshUser();   // osvježi navbar
-            closeModal();    // zatvori modal
+            refreshUser(); 
+            closeModal(); 
         } catch (err) {
             setError(err.message);
         }

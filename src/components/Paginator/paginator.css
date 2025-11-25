@@ -1,0 +1,20 @@
+.paginator {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.paginator button {
+    padding: 6px 12px;
+    background: #e0e0e0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.paginator button.active {
+    background: #00b36b;
+    color: white;
+}

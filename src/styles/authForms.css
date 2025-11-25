@@ -1,4 +1,3 @@
-/* Modal pozadina */
 .auth-modal {
     position: fixed;
     top: 0;
@@ -12,7 +11,6 @@
     z-index: 1000;
 }
 
-/* Modal container */
 .auth-container {
     width: 90%;
     max-width: 400px;
@@ -47,7 +45,6 @@
     font-weight: bold;
 }
 
-/* Close button */
 .auth-container .close-btn {
     position: absolute;
     top: 10px;
@@ -59,7 +56,6 @@
         color: black; 
 }
 
-/* Error poruka */
 .error {
     color: red;
     margin-bottom: 10px;

@@ -11,13 +11,11 @@ function App() {
   const [authModal, setAuthModal] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // učitavanje stanja usera pri reloadu stranice
   useEffect(() => {
     const user = authService.getCurrentUser();
     setIsLoggedIn(!!user);
   }, []);
 
-  // poziva se nakon login/sign up/log out
   const refreshUser = () => {
     const user = authService.getCurrentUser();
     setIsLoggedIn(!!user);
@@ -33,7 +31,7 @@ function App() {
         openSignIn={openSignIn}
         openSignUp={openSignUp}
         isLoggedIn={isLoggedIn}
-        refreshUser={refreshUser}  // da bi logout odmah osvježio stanje
+        refreshUser={refreshUser} 
       />
 
       <div style={{ padding: "20px" }}>
