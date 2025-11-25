@@ -1,0 +1,50 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import authService from "../../services/authService";
+import "./navbar.css";
+
+export default function NavbarComponent({ openSignIn, openSignUp, isLoggedIn, refreshUser }) {
+
+    const user = authService.getCurrentUser();
+
+    const handleLogout = () => {
+        authService.logout();
+        refreshUser();  // ODMAH osvježi stanje u App.jsx
+    };
+
+    return (
+        <nav className="navbar">
+            <div className="left">
+                <Link to="/">Home</Link>
+                {isLoggedIn && <Link to="/bookmarks">Bookmarks</Link>}
+            </div>
+
+            <div className="center">
+                <Link to="/">Four Bytes</Link>
+            </div>
+
+            <div className="right">
+                {!isLoggedIn && (
+                    <>
+                        <button className="btn" onClick={openSignIn}>Sign In</button>
+                        <button className="btn primary" onClick={openSignUp}>Sign Up</button>
+                    </>
+                )}
+
+                {isLoggedIn && user && (
+                    <>
+                        <span>{user.username}</span>
+
+                        {user.role === "admin" && (
+                            <button className="btn admin">Add Recipe</button>
+                        )}
+
+                        <button onClick={handleLogout} className="btn logout">
+                            Sign Out
+                        </button>
+                    </>
+                )}
+            </div>
+        </nav>
+    );
+}

@@ -1,0 +1,46 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.left,
+.center,
+.right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.center {
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.btn {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
+.btn.primary {
+    background-color: black;
+    color: white;
+    border: none;
+}
+
+.btn.admin {
+    background-color: blue;
+    color: white;
+}
+
+.btn.logout {
+    background-color: red;
+    color: white;
+}

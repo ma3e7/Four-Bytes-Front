@@ -1,35 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route } from "react-router-dom";
+import NavbarComponent from "./components/NavBar/NavBarComponent";
+import HomePage from "./pages/HomePage";
+import SignInComponent from "./components/SignIn/SignInComponent";
+import SignUpComponent from "./components/SignUp/SignUpComponent";
+import { useState, useEffect } from "react";
+import authService from "./services/authService";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [authModal, setAuthModal] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // učitavanje stanja usera pri reloadu stranice
+  useEffect(() => {
+    const user = authService.getCurrentUser();
+    setIsLoggedIn(!!user);
+  }, []);
+
+  // poziva se nakon login/sign up/log out
+  const refreshUser = () => {
+    const user = authService.getCurrentUser();
+    setIsLoggedIn(!!user);
+  };
+
+  const openSignIn = () => setAuthModal("signin");
+  const openSignUp = () => setAuthModal("signup");
+  const closeModal = () => setAuthModal(null);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <NavbarComponent
+        openSignIn={openSignIn}
+        openSignUp={openSignUp}
+        isLoggedIn={isLoggedIn}
+        refreshUser={refreshUser}  // da bi logout odmah osvježio stanje
+      />
+
+      <div style={{ padding: "20px" }}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+      {authModal === "signin" && (
+        <SignInComponent closeModal={closeModal} refreshUser={refreshUser} />
+      )}
+
+      {authModal === "signup" && (
+        <SignUpComponent closeModal={closeModal} openSignIn={openSignIn} refreshUser={refreshUser} />
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
