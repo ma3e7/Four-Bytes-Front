@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import NavbarComponent from "./components/NavBar/NavBarComponent";
 import HomePage from "./pages/HomePage";
+import RecipePage from "./pages/RecipePage"; // DODAJ OVAJ IMPORT
 import SignInComponent from "./components/SignIn/SignInComponent";
 import SignUpComponent from "./components/SignUp/SignUpComponent";
 import { useState, useEffect } from "react";
@@ -37,6 +38,7 @@ function App() {
       <div style={{ padding: "20px" }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/recipe/:recipeId" element={<RecipePage />} /> {/* DODAJ OVU RUTU */}
         </Routes>
       </div>
 
