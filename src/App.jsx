@@ -34,7 +34,7 @@ function App() {
         refreshUser={refreshUser} 
       />
 
-      <div style={{ padding: "20px" }}>
+      <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
         </Routes>

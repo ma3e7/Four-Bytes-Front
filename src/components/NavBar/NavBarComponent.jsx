@@ -14,7 +14,6 @@ export default function NavbarComponent({ openSignIn, openSignUp, isLoggedIn, re
     return (
         <nav className="navbar">
             <div className="left">
-                <Link to="/">Home</Link>
                 {isLoggedIn && <Link to="/bookmarks">Bookmarks</Link>}
             </div>
 
