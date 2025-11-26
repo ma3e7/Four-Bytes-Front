@@ -1,4 +1,3 @@
-// components/PaginatorComponent.jsx
 import "./paginator.css";
 
 export default function PaginatorComponent({ currentPage, totalPages, onPageChange }) {

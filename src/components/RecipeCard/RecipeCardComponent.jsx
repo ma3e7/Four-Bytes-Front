@@ -1,26 +1,30 @@
-// components/RecipeCardComponent.jsx
+import React from "react";
 import "./RecipeCard.css";
 
-export default function RecipeCardComponent({ recipe }) {
+export default function RecipeCard({ recipe }) {
     return (
         <div className="recipe-card">
-            <div className="recipe-image" style={{ backgroundImage: `url(${recipe.image})` }}>
-                <h3 className="recipe-title">{recipe.name}</h3>
+            <div
+                className="recipe-image"
+                style={{ backgroundImage: `url(${recipe.image})` }}
+            >
+                <h3 className="recipe-name">{recipe.name}</h3>
             </div>
 
             <div className="recipe-info">
-                <div className="recipe-meta">
-                    <span>⭐ {recipe.complexity}</span>
+                <div className="rating-time">
+                    <span>⭐ {recipe.rating || 0}</span>
                     <span>⏱ {recipe.cookingTime} min</span>
                 </div>
+            </div>
 
-                <div className="ingredients-box">
-                    {recipe.ingredients?.slice(0, 5).map((i, index) => (
-                        <span key={index} className="ingredient-item">
-                            {i.name}
-                        </span>
+            <div className="ingredients-overlay">
+                <h4>Ingredients</h4>
+
+                <div className="ingredients-list">
+                    {recipe.ingredients.map((ing) => (
+                        <span key={ing._id}>{ing.name}</span>
                     ))}
-                    {recipe.ingredients?.length > 5 && <p>+ više...</p>}
                 </div>
             </div>
         </div>

@@ -1,6 +1,5 @@
 const API_URL = "https://lighthearted-sable-a6c328.netlify.app/api";
 
-// --- REGISTER ---
 export async function register(username, password) {
     const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
@@ -8,7 +7,6 @@ export async function register(username, password) {
         body: JSON.stringify({ username, password }),
     });
 
-    // Backend NE vraća always JSON kad dođe do greške → ovo štiti frontend
     let data = null;
     try {
         data = await response.json();
@@ -23,7 +21,6 @@ export async function register(username, password) {
     return data;
 }
 
-// --- LOGIN ---
 export async function login(username, password) {
     const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
@@ -42,20 +39,17 @@ export async function login(username, password) {
         throw new Error(data.message || "Login failed");
     }
 
-    // čuvamo user/token
     localStorage.setItem("authToken", data.token);
     localStorage.setItem("authUser", JSON.stringify(data.user));
 
     return data;
 }
 
-// --- GET CURRENT USER ---
 export function getCurrentUser() {
     const user = localStorage.getItem("authUser");
     return user ? JSON.parse(user) : null;
 }
 
-// --- LOGOUT ---
 export function logout() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("authUser");

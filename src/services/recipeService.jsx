@@ -1,4 +1,3 @@
-
 const API_URL = "https://lighthearted-sable-a6c328.netlify.app/api/recipes";
 
 export const getAllRecipes = async () => {
