@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "../styles/recipePage.css";
 
 import { getCurrentUser } from "../services/authService";
@@ -8,13 +8,12 @@ import noteService from "../services/noteService";
 import reviewService from "../services/reviewService";
 
 export default function RecipePage() {
-    const { recipeId } = useParams(); 
-    const navigate = useNavigate();
+    const { recipeId } = useParams();
 
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const [notes, setNotes] = useState([]);
+    const [note, setNote] = useState(null);
     const [reviews, setReviews] = useState([]);
 
     const [newNote, setNewNote] = useState("");
@@ -26,12 +25,18 @@ export default function RecipePage() {
     useEffect(() => {
         async function fetchData() {
             try {
+                // Fetch recipe
                 const r = await recipeService.getRecipeById(recipeId);
                 setRecipe(r);
 
-                const n = await noteService.getNotes(recipeId);
-                setNotes(n);
+                // Fetch note samo ako je user ulogovan
+                let n = [];
+                if (user) {
+                    n = await noteService.getNotes(recipeId);
+                }
+                setNote(n[0] || null);
 
+                // Fetch reviews (svi)
                 const rev = await reviewService.getReviews(recipeId);
                 setReviews(rev);
             } catch (err) {
@@ -42,41 +47,69 @@ export default function RecipePage() {
         }
 
         fetchData();
-    }, [recipeId]);
+    }, [recipeId, user]);
 
+    // Bookmark
     async function handleBookmark() {
         if (!user) return;
-
         const updated = await recipeService.toggleBookmark(recipeId);
         setRecipe((prev) => ({ ...prev, bookmarked: updated.bookmarked }));
     }
 
-    async function handleAddNote(e) {
+    // Note handlers
+    async function handleAddOrEditNote(e) {
         e.preventDefault();
         if (!newNote.trim()) return;
 
-        const created = await noteService.createNote(recipeId, newNote);
-        setNotes((prev) => [...prev, created]);
+        if (note) {
+            const updated = await noteService.editNote(note._id, newNote);
+            setNote(updated);
+        } else {
+            const created = await noteService.createNote(recipeId, newNote);
+            created.user = { username: user.username, _id: user._id };
+            setNote(created);
+        }
         setNewNote("");
     }
 
-    async function handleDeleteNote(noteId) {
-        await noteService.deleteNote(noteId);
-        setNotes((prev) => prev.filter((n) => n._id !== noteId));
+    async function handleDeleteNote() {
+        if (!note) return;
+        await noteService.deleteNote(note._id);
+        setNote(null);
     }
 
-    async function handleAddReview(e) {
+    // Review handlers
+    const userReview = reviews.find(r => r.user?._id === user?._id);
+
+    async function handleAddOrEditReview(e) {
         e.preventDefault();
+        if (!newReviewComment.trim()) return;
 
-        const created = await reviewService.createReview(
-            recipeId,
-            newReviewRating,
-            newReviewComment
-        );
+        if (userReview) {
+            const updated = await reviewService.editReview(
+                userReview._id,
+                newReviewRating,
+                newReviewComment
+            );
+            updated.user = { username: user.username, _id: user._id };
+            setReviews(reviews.map(r => r._id === userReview._id ? updated : r));
+        } else {
+            const created = await reviewService.createReview(
+                recipeId,
+                newReviewRating,
+                newReviewComment
+            );
+            created.user = { username: user.username, _id: user._id };
+            setReviews([...reviews, created]);
+        }
 
-        setReviews((prev) => [...prev, created]);
         setNewReviewComment("");
         setNewReviewRating(5);
+    }
+
+    async function handleDeleteReview(reviewId) {
+        await reviewService.deleteReview(reviewId);
+        setReviews(reviews.filter(r => r._id !== reviewId));
     }
 
     if (loading) return <div className="loading">Loading recipe...</div>;
@@ -84,7 +117,6 @@ export default function RecipePage() {
 
     return (
         <div className="recipe-page">
-
             <div className="recipe-header">
                 <h1>{recipe.name}</h1>
                 {user && (
@@ -123,30 +155,15 @@ export default function RecipePage() {
             {user && (
                 <div className="notes-section">
                     <h2>Notes</h2>
-                    <form className="note-form" onSubmit={handleAddNote}>
+                    <form className="note-form" onSubmit={handleAddOrEditNote}>
                         <textarea
                             placeholder="Write a note..."
-                            value={newNote}
+                            value={note ? note.text : newNote}
                             onChange={(e) => setNewNote(e.target.value)}
                         ></textarea>
-                        <button type="submit">Add Note</button>
+                        <button type="submit">{note ? "Edit Note" : "Add Note"}</button>
+                        {note && <button type="button" onClick={handleDeleteNote}>Delete Note</button>}
                     </form>
-                    <div className="notes-list">
-                        {notes.map((note) => (
-                            <div key={note._id} className="note-item">
-                                <div className="note-content">
-                                    <p>{note.text}</p>
-                                    <small>By {note.user?.username ?? "Unknown"}</small>
-                                </div>
-                                <button
-                                    className="delete-btn"
-                                    onClick={() => handleDeleteNote(note._id)}
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             )}
 
@@ -158,12 +175,12 @@ export default function RecipePage() {
 
             <div className="reviews-section">
                 <h2>Reviews</h2>
-                {user ? (
-                    <form className="review-form" onSubmit={handleAddReview}>
+                {user && (
+                    <form className="review-form" onSubmit={handleAddOrEditReview}>
                         <div className="rating-input">
                             <label>Rating:</label>
                             <select
-                                value={newReviewRating}
+                                value={userReview ? userReview.rating : newReviewRating}
                                 onChange={(e) => setNewReviewRating(Number(e.target.value))}
                             >
                                 <option>1</option>
@@ -175,12 +192,19 @@ export default function RecipePage() {
                         </div>
                         <textarea
                             placeholder="Write your review..."
-                            value={newReviewComment}
+                            value={userReview ? userReview.comment : newReviewComment}
                             onChange={(e) => setNewReviewComment(e.target.value)}
                         ></textarea>
-                        <button type="submit">Post Review</button>
+                        <button type="submit">{userReview ? "Edit Review" : "Post Review"}</button>
+                        {userReview && (
+                            <button type="button" onClick={() => handleDeleteReview(userReview._id)}>
+                                Delete Review
+                            </button>
+                        )}
                     </form>
-                ) : (
+                )}
+
+                {!user && (
                     <div className="login-prompt">
                         Log in to post a review.
                     </div>
