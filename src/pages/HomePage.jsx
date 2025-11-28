@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getAllRecipes } from "../services/recipeService";
 import RecipeCardComponent from "../components/RecipeCard/RecipeCardComponent";
 import PaginatorComponent from "../components/Paginator/PaginatorComponent";
+import SearchComponent from "../components/SearchBaR/SearchComponent";
 import "../styles/homePage.css";
 
 export default function HomePage() {
@@ -24,8 +25,10 @@ export default function HomePage() {
         <div className="home-container">
             <h1 className="home-title">Recipes</h1>
 
+            <SearchComponent setRecipes={setRecipes} setCurrentPage={setCurrentPage} />
+
             <div className="recipe-grid">
-                {currentRecipes.map((recipe) => (
+                {currentRecipes.map(recipe => (
                     <RecipeCardComponent key={recipe._id} recipe={recipe} />
                 ))}
             </div>
