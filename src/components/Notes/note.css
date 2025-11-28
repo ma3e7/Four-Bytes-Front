@@ -1,0 +1,96 @@
+/* note.css */
+.notes-section {
+    margin-bottom: 30px;
+}
+
+.notes-section h2 {
+    color: #1e90ff;
+    font-size: 1.6rem;
+    border-bottom: 2px solid #1e90ff;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.note-item {
+    background: #ffffff;
+    border-left: 5px solid #28a745;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.note-item p {
+    margin: 0 0 10px 0;
+    line-height: 1.5;
+    color: #333;
+}
+
+.note-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-btn,
+.delete-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.edit-btn {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.edit-btn:hover {
+    background-color: #e0a800;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+.note-form textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    font-family: inherit;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.note-form button {
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background 0.2s ease;
+}
+
+.note-form button:hover {
+    background-color: #0d6efd;
+}
+
+.login-prompt {
+    background: #fff3cd;
+    color: #856404;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ffeaa7;
+    text-align: center;
+    font-size: 0.95rem;
+}
