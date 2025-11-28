@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom"; // DODAJ OVAJ IMPORT
+import { useNavigate } from "react-router-dom"; 
 import "./RecipeCard.css";
 
 export default function RecipeCard({ recipe }) {

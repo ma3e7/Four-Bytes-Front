@@ -1,228 +1,100 @@
-// pages/RecipePage.jsx
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import '../styles/RecipePage.css';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import "../styles/recipePage.css";
 
-const API_URL = "https://lighthearted-sable-a6c328.netlify.app/api";
+import { getCurrentUser } from "../services/authService";
+import recipeService from "../services/recipeService";
+import noteService from "../services/noteService";
+import reviewService from "../services/reviewService";
 
-const RecipePage = () => {
-    const { recipeId } = useParams();
+export default function RecipePage() {
+    const { recipeId } = useParams(); 
     const navigate = useNavigate();
+
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
-    const [newNote, setNewNote] = useState('');
-    const [user, setUser] = useState(null);
 
-    // Provera da li je korisnik ulogovan
-    useEffect(() => {
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            setUser(JSON.parse(userData));
-        }
-    }, []);
+    const [notes, setNotes] = useState([]);
+    const [reviews, setReviews] = useState([]);
 
-    // Učitavanje recepta
+    const [newNote, setNewNote] = useState("");
+    const [newReviewComment, setNewReviewComment] = useState("");
+    const [newReviewRating, setNewReviewRating] = useState(5);
+
+    const user = getCurrentUser();
+
     useEffect(() => {
-        const fetchRecipe = async () => {
+        async function fetchData() {
             try {
-                setLoading(true);
-                const response = await fetch(`${API_URL}/recipes`);
-                if (!response.ok) throw new Error('Failed to fetch recipes');
-                
-                const recipes = await response.json();
-                const foundRecipe = recipes.find(r => r._id === recipeId);
-                
-                if (foundRecipe) {
-                    setRecipe(foundRecipe);
-                } else {
-                    setError('Recipe not found');
-                }
+                const r = await recipeService.getRecipeById(recipeId);
+                setRecipe(r);
+
+                const n = await noteService.getNotes(recipeId);
+                setNotes(n);
+
+                const rev = await reviewService.getReviews(recipeId);
+                setReviews(rev);
             } catch (err) {
-                setError(err.message);
+                console.error(err);
             } finally {
                 setLoading(false);
             }
-        };
+        }
 
-        fetchRecipe();
+        fetchData();
     }, [recipeId]);
 
-    // Dodavanje recenzije
-    const handleAddReview = async (e) => {
-        e.preventDefault();
-        if (!user) {
-            alert('Please login to add a review');
-            return;
-        }
-
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_URL}/reviews`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    recipe: recipeId,
-                    rating: newReview.rating,
-                    comment: newReview.comment,
-                    user: user.id
-                })
-            });
-
-            if (!response.ok) throw new Error('Failed to add review');
-
-            const savedReview = await response.json();
-            
-            // Ažuriranje recepta sa novom recenzijom
-            const updatedRecipe = {
-                ...recipe,
-                reviews: [...recipe.reviews, savedReview]
-            };
-            setRecipe(updatedRecipe);
-            setNewReview({ rating: 5, comment: '' });
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-
-    // Dodavanje beleške
-    const handleAddNote = async (e) => {
-        e.preventDefault();
-        if (!user) {
-            alert('Please login to add a note');
-            return;
-        }
-
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_URL}/note`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    recipe: recipeId,
-                    content: newNote,
-                    user: user.id
-                })
-            });
-
-            if (!response.ok) throw new Error('Failed to add note');
-
-            const savedNote = await response.json();
-            
-            // Ažuriranje recepta sa novom beleškom
-            const updatedRecipe = {
-                ...recipe,
-                notes: [...recipe.notes, savedNote]
-            };
-            setRecipe(updatedRecipe);
-            setNewNote('');
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-
-    // Brisanje recenzije
-    const handleDeleteReview = async (reviewId) => {
+    async function handleBookmark() {
         if (!user) return;
 
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+        const updated = await recipeService.toggleBookmark(recipeId);
+        setRecipe((prev) => ({ ...prev, bookmarked: updated.bookmarked }));
+    }
 
-            if (!response.ok) throw new Error('Failed to delete review');
+    async function handleAddNote(e) {
+        e.preventDefault();
+        if (!newNote.trim()) return;
 
-            // Uklanjanje recenzije iz stanja
-            const updatedRecipe = {
-                ...recipe,
-                reviews: recipe.reviews.filter(review => review._id !== reviewId)
-            };
-            setRecipe(updatedRecipe);
-        } catch (err) {
-            setError(err.message);
-        }
-    };
+        const created = await noteService.createNote(recipeId, newNote);
+        setNotes((prev) => [...prev, created]);
+        setNewNote("");
+    }
 
-    // Brisanje beleške
-    const handleDeleteNote = async (noteId) => {
-        if (!user) return;
+    async function handleDeleteNote(noteId) {
+        await noteService.deleteNote(noteId);
+        setNotes((prev) => prev.filter((n) => n._id !== noteId));
+    }
 
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_URL}/note/${noteId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+    async function handleAddReview(e) {
+        e.preventDefault();
 
-            if (!response.ok) throw new Error('Failed to delete note');
+        const created = await reviewService.createReview(
+            recipeId,
+            newReviewRating,
+            newReviewComment
+        );
 
-            // Uklanjanje beleške iz stanja
-            const updatedRecipe = {
-                ...recipe,
-                notes: recipe.notes.filter(note => note._id !== noteId)
-            };
-            setRecipe(updatedRecipe);
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-
-    // Bookmark funkcionalnost
-    const handleToggleBookmark = async () => {
-        if (!user) {
-            alert('Please login to bookmark recipes');
-            return;
-        }
-
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_URL}/recipes/bookmark/${recipeId}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) throw new Error('Failed to toggle bookmark');
-
-            const data = await response.json();
-            setRecipe(data.recipe);
-        } catch (err) {
-            setError(err.message);
-        }
-    };
+        setReviews((prev) => [...prev, created]);
+        setNewReviewComment("");
+        setNewReviewRating(5);
+    }
 
     if (loading) return <div className="loading">Loading recipe...</div>;
-    if (error) return <div className="error">Error: {error}</div>;
-    if (!recipe) return <div className="error">Recipe not found</div>;
+    if (!recipe) return <div className="error">Recipe not found.</div>;
 
     return (
         <div className="recipe-page">
-            <button onClick={() => navigate(-1)} className="back-button">
-                ← Back
-            </button>
 
             <div className="recipe-header">
                 <h1>{recipe.name}</h1>
-                <button 
-                    onClick={handleToggleBookmark}
-                    className={`bookmark-btn ${recipe.bookmarked ? 'bookmarked' : ''}`}
-                >
-                    {recipe.bookmarked ? '★ Bookmarked' : '☆ Bookmark'}
-                </button>
+                {user && (
+                    <button
+                        className={`bookmark-btn ${recipe.bookmarked ? "bookmarked" : ""}`}
+                        onClick={handleBookmark}
+                    >
+                        {recipe.bookmarked ? "★ Bookmarked" : "☆ Bookmark"}
+                    </button>
+                )}
             </div>
 
             {recipe.image && (
@@ -230,115 +102,106 @@ const RecipePage = () => {
             )}
 
             <div className="recipe-info">
-                <p><strong>Cooking Time:</strong> {recipe.cookingTime} minutes</p>
+                <p><strong>Cooking time:</strong> {recipe.cookingTime} min</p>
                 <p><strong>Complexity:</strong> {recipe.complexity}/5</p>
             </div>
 
-            <section className="ingredients-section">
+            <div className="ingredients-section">
                 <h2>Ingredients</h2>
                 <ul className="ingredients-list">
-                    {recipe.ingredients && recipe.ingredients.map(ingredient => (
-                        <li key={ingredient._id} className="ingredient-item">
-                            {ingredient.name}
-                        </li>
+                    {recipe.ingredients.map((ing) => (
+                        <li key={ing._id} className="ingredient-item">{ing.name}</li>
                     ))}
                 </ul>
-            </section>
+            </div>
 
-            <section className="description-section">
-                <h2>Preparation Description</h2>
+            <div className="description-section">
+                <h2>Description</h2>
                 <p className="description">{recipe.description}</p>
-            </section>
+            </div>
 
-            {/* Notes Section */}
-            <section className="notes-section">
-                <h2>Notes</h2>
-                {user ? (
-                    <form onSubmit={handleAddNote} className="note-form">
+            {user && (
+                <div className="notes-section">
+                    <h2>Notes</h2>
+                    <form className="note-form" onSubmit={handleAddNote}>
                         <textarea
+                            placeholder="Write a note..."
                             value={newNote}
                             onChange={(e) => setNewNote(e.target.value)}
-                            placeholder="Add your personal notes about this recipe..."
-                            required
-                            rows="3"
-                        />
+                        ></textarea>
                         <button type="submit">Add Note</button>
                     </form>
-                ) : (
-                    <p className="login-prompt">Please login to add notes</p>
-                )}
-                
-                <div className="notes-list">
-                    {recipe.notes && recipe.notes.map(note => (
-                        <div key={note._id} className="note-item">
-                            <div className="note-content">
-                                <p>{note.content}</p>
-                                <small>By: {note.user?.username || 'Unknown'}</small>
-                            </div>
-                            {user && note.user?._id === user.id && (
-                                <button 
-                                    onClick={() => handleDeleteNote(note._id)}
+                    <div className="notes-list">
+                        {notes.map((note) => (
+                            <div key={note._id} className="note-item">
+                                <div className="note-content">
+                                    <p>{note.text}</p>
+                                    <small>By {note.user?.username ?? "Unknown"}</small>
+                                </div>
+                                <button
                                     className="delete-btn"
+                                    onClick={() => handleDeleteNote(note._id)}
                                 >
                                     Delete
                                 </button>
-                            )}
-                        </div>
-                    ))}
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </section>
+            )}
 
-            {/* Reviews Section */}
-            <section className="reviews-section">
+            {!user && (
+                <div className="login-prompt">
+                    Log in to create notes for this recipe.
+                </div>
+            )}
+
+            <div className="reviews-section">
                 <h2>Reviews</h2>
                 {user ? (
-                    <form onSubmit={handleAddReview} className="review-form">
+                    <form className="review-form" onSubmit={handleAddReview}>
                         <div className="rating-input">
                             <label>Rating:</label>
                             <select
-                                value={newReview.rating}
-                                onChange={(e) => setNewReview({...newReview, rating: parseInt(e.target.value)})}
+                                value={newReviewRating}
+                                onChange={(e) => setNewReviewRating(Number(e.target.value))}
                             >
-                                {[1, 2, 3, 4, 5].map(num => (
-                                    <option key={num} value={num}>{num} ★</option>
-                                ))}
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
                             </select>
                         </div>
                         <textarea
-                            value={newReview.comment}
-                            onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
-                            placeholder="Share your experience with this recipe..."
-                            required
-                            rows="4"
-                        />
-                        <button type="submit">Submit Review</button>
+                            placeholder="Write your review..."
+                            value={newReviewComment}
+                            onChange={(e) => setNewReviewComment(e.target.value)}
+                        ></textarea>
+                        <button type="submit">Post Review</button>
                     </form>
                 ) : (
-                    <p className="login-prompt">Please login to add reviews</p>
+                    <div className="login-prompt">
+                        Log in to post a review.
+                    </div>
                 )}
-                
+
                 <div className="reviews-list">
-                    {recipe.reviews && recipe.reviews.map(review => (
+                    {reviews.map((review) => (
                         <div key={review._id} className="review-item">
                             <div className="review-header">
-                                <span className="review-rating">{'★'.repeat(review.rating)}</span>
-                                <span className="review-author">By: {review.user?.username || 'Unknown'}</span>
+                                <span className="review-author">
+                                    {review.user?.username ?? "Unknown"}
+                                </span>
+                                <span className="review-rating">
+                                    {"★".repeat(review.rating)}
+                                </span>
                             </div>
                             <p className="review-comment">{review.comment}</p>
-                            {user && review.user?._id === user.id && (
-                                <button 
-                                    onClick={() => handleDeleteReview(review._id)}
-                                    className="delete-btn"
-                                >
-                                    Delete
-                                </button>
-                            )}
                         </div>
                     ))}
                 </div>
-            </section>
+            </div>
         </div>
     );
-};
-
-export default RecipePage;
+}

@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import NavbarComponent from "./components/NavBar/NavBarComponent";
 import HomePage from "./pages/HomePage";
-import RecipePage from "./pages/RecipePage"; // DODAJ OVAJ IMPORT
+import RecipePage from "./pages/RecipePage";
 import SignInComponent from "./components/SignIn/SignInComponent";
 import SignUpComponent from "./components/SignUp/SignUpComponent";
 import { useState, useEffect } from "react";
@@ -32,13 +32,13 @@ function App() {
         openSignIn={openSignIn}
         openSignUp={openSignUp}
         isLoggedIn={isLoggedIn}
-        refreshUser={refreshUser} 
+        refreshUser={refreshUser}
       />
 
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/recipe/:recipeId" element={<RecipePage />} /> {/* DODAJ OVU RUTU */}
+          <Route path="/recipe/:recipeId" element={<RecipePage />} />
         </Routes>
       </div>
 
@@ -47,7 +47,11 @@ function App() {
       )}
 
       {authModal === "signup" && (
-        <SignUpComponent closeModal={closeModal} openSignIn={openSignIn} refreshUser={refreshUser} />
+        <SignUpComponent
+          closeModal={closeModal}
+          openSignIn={openSignIn}
+          refreshUser={refreshUser}
+        />
       )}
     </>
   );

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { getAllRecipes } from "../services/recipeService";
 import RecipeCardComponent from "../components/RecipeCard/RecipeCardComponent";
@@ -12,7 +11,9 @@ export default function HomePage() {
     const itemsPerPage = 16;
 
     useEffect(() => {
-        getAllRecipes().then(setRecipes).catch(console.error);
+        getAllRecipes()
+            .then(setRecipes)
+            .catch(console.error);
     }, []);
 
     const start = currentPage * itemsPerPage;
@@ -25,7 +26,7 @@ export default function HomePage() {
 
             <div className="recipe-grid">
                 {currentRecipes.map((recipe) => (
-                    <RecipeCardComponent key={recipe.id} recipe={recipe} />
+                    <RecipeCardComponent key={recipe._id} recipe={recipe} />
                 ))}
             </div>
 
