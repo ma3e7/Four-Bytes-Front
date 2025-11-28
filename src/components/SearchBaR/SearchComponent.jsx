@@ -21,20 +21,55 @@ export default function SearchComponent({ setRecipes, setCurrentPage }) {
         }
 
         try {
+            let data;
             if (searchType === "ingredient") {
-                const data = await ingredientService.getIngredientsByName(value.trim());
-                setSuggestions(data.map(i => i.name));
+                data = await ingredientService.getIngredientsByName(value.trim());
+                data = data.map(i => i.name);
             } else if (searchType === "name") {
-                const data = await getRecipesByName(value.trim());
-                setSuggestions(data.map(r => r.name));
+                data = await getRecipesByName(value.trim());
+                data = data.map(r => r.name);
             }
+
+            const lowerValue = value.toLowerCase();
+            const sorted = data.sort((a, b) => {
+                const aLower = a.toLowerCase();
+                const bLower = b.toLowerCase();
+
+                const indexA = aLower.indexOf(lowerValue);
+                const indexB = bLower.indexOf(lowerValue);
+
+                if (indexA !== indexB) return indexA - indexB;
+
+                return aLower.length - bLower.length;
+            });
+
+            setSuggestions(sorted);
         } catch (err) {
             console.error(err);
             setSuggestions([]);
         }
     };
 
+
     const handleKeyDown = (e) => {
+        if (e.key === "Tab" && suggestions.length > 0) {
+            e.preventDefault();
+            const first = suggestions[0];
+
+            setInputValue(first);
+
+            if (searchType === "name") {
+                setSuggestions([]);
+                performSearch();
+            }
+
+            if (searchType === "ingredient") {
+                addTag(first);
+            }
+
+            return;
+        }
+
         if (searchType === "ingredient" && e.key === "," && inputValue.trim()) {
             addTag(inputValue.trim());
             e.preventDefault();
@@ -65,8 +100,7 @@ export default function SearchComponent({ setRecipes, setCurrentPage }) {
                 recipes = inputValue.trim()
                     ? await getRecipesByName(inputValue.trim())
                     : await getAllRecipes();
-            }
-            else if (searchType === "ingredient") {
+            } else if (searchType === "ingredient") {
                 const ingredientsList = searchData || tags;
                 recipes = ingredientsList.length > 0
                     ? await getRecipesByIngredients(ingredientsList)
@@ -96,7 +130,6 @@ export default function SearchComponent({ setRecipes, setCurrentPage }) {
         setTags([]);
         setSuggestions([]);
 
-        // Po promjeni tipa pretrage vrati sve recepte
         getAllRecipes().then(setRecipes);
         setCurrentPage(0);
     };
