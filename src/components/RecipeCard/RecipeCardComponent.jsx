@@ -1,9 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // DODAJ OVAJ IMPORT
 import "./RecipeCard.css";
 
 export default function RecipeCard({ recipe }) {
+    const navigate = useNavigate(); // DODAJ OVU LINIJU
+
+    const handleCardClick = () => {
+        navigate(`/recipe/${recipe._id}`); // KORISTI recipe._id UMESTO recipe.id
+    };
+
     return (
-        <div className="recipe-card">
+        <div className="recipe-card" onClick={handleCardClick}> {/* DODAJ onClick HANDLER */}
             <div
                 className="recipe-image"
                 style={{ backgroundImage: `url(${recipe.image})` }}

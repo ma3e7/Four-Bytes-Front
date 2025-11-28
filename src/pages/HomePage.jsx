@@ -21,7 +21,7 @@ export default function HomePage() {
 
     return (
         <div className="home-container">
-            <h1 className="home-title">Recepti</h1>
+            <h1 className="home-title">Recipes</h1>
 
             <div className="recipe-grid">
                 {currentRecipes.map((recipe) => (
