@@ -19,14 +19,19 @@ export async function toggleBookmark(recipeId) {
     const token = localStorage.getItem("authToken");
 
     const response = await fetch(`${API_URL}/recipes/bookmark/${recipeId}`, {
-        method: "POST",
+        method: "PUT", 
         headers: {
             "Authorization": `Bearer ${token}`,
         },
     });
 
+    if (!response.ok) {
+        throw new Error(`Error toggling bookmark: ${response.statusText}`);
+    }
+
     return response.json();
 }
+
 
 export async function getRecipesByName(name) {
     const response = await fetch(`${API_URL}/recipes/search?name=${encodeURIComponent(name)}`);
@@ -34,6 +39,17 @@ export async function getRecipesByName(name) {
     if (!response.ok) {
         throw new Error("Error fetching recipes by name");
     }
+
+    return response.json();
+}
+
+export async function getBookmarkedRecipes() {
+    const token = localStorage.getItem("authToken");
+    const response = await fetch(`${API_URL}/recipes/bookmarked`, {
+        headers: { "Authorization": `Bearer ${token}` },
+    });
+
+    if (!response.ok) throw new Error("Error fetching bookmarked recipes");
 
     return response.json();
 }
@@ -57,5 +73,6 @@ export default {
     getRecipeById,
     toggleBookmark,
     getRecipesByName,
-    getRecipesByIngredients
+    getRecipesByIngredients,
+    getBookmarkedRecipes
 };

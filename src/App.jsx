@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import NavbarComponent from "./components/NavBar/NavBarComponent";
 import HomePage from "./pages/HomePage";
 import RecipePage from "./pages/RecipePage";
+import BookmarksPage from "./pages/BookmarksPage";
 import SignInComponent from "./components/SignIn/SignInComponent";
 import SignUpComponent from "./components/SignUp/SignUpComponent";
 import { useState, useEffect } from "react";
@@ -38,6 +39,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/bookmarks" element={<BookmarksPage />} />
           <Route path="/recipe/:recipeId" element={<RecipePage />} />
         </Routes>
       </div>

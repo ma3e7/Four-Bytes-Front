@@ -11,6 +11,7 @@ export default function RecipePage() {
     const { recipeId } = useParams();
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
     const user = getCurrentUser();
 
@@ -28,11 +29,20 @@ export default function RecipePage() {
         fetchData();
     }, [recipeId]);
 
-    async function handleBookmark() {
-        if (!user) return;
-        const updated = await recipeService.toggleBookmark(recipeId);
-        setRecipe(prev => ({ ...prev, bookmarked: updated.bookmarked }));
-    }
+    const handleBookmark = async () => {
+        if (!user || bookmarkLoading) return;
+
+        try {
+            setBookmarkLoading(true);
+            const updated = await recipeService.toggleBookmark(recipeId);
+
+            setRecipe(prev => ({ ...prev, bookmarked: updated.recipe.bookmarked }));
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setBookmarkLoading(false);
+        }
+    };
 
     if (loading) return <div className="loading">Loading recipe...</div>;
     if (!recipe) return <div className="error">Recipe not found.</div>;
@@ -45,13 +55,20 @@ export default function RecipePage() {
                     <button
                         className={`bookmark-btn ${recipe.bookmarked ? "bookmarked" : ""}`}
                         onClick={handleBookmark}
+                        disabled={bookmarkLoading}
                     >
-                        {recipe.bookmarked ? "★ Bookmarked" : "☆ Bookmark"}
+                        {bookmarkLoading
+                            ? "Processing..."
+                            : recipe.bookmarked
+                                ? "★ Remove Bookmark"
+                                : "☆ Bookmark"}
                     </button>
                 )}
             </div>
 
-            {recipe.image && <img src={recipe.image} alt={recipe.name} className="recipe-image" />}
+            {recipe.image && (
+                <img src={recipe.image} alt={recipe.name} className="recipe-image" />
+            )}
 
             <div className="recipe-info">
                 <p><strong>Cooking time:</strong> {recipe.cookingTime} min</p>
@@ -72,7 +89,6 @@ export default function RecipePage() {
                 <p className="description">{recipe.description}</p>
             </div>
 
-            {/* Notes i Reviews */}
             <NoteComponent recipeId={recipeId} user={user} />
             <ReviewComponent recipeId={recipeId} user={user} />
         </div>
