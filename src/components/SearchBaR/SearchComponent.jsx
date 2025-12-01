@@ -112,7 +112,7 @@ export default function SearchComponent({ setRecipes, setCurrentPage }) {
         } catch (err) {
             console.error(err);
         }
-    };
+    };  
 
     const handleSubmit = (e) => {
         e.preventDefault();

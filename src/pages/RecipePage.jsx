@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "../styles/recipePage.css";
+import '../styles/recipePage.css'
 
 import { getCurrentUser } from "../services/authService";
 import recipeService from "../services/recipeService";
@@ -55,8 +55,7 @@ export default function RecipePage() {
                     <button
                         className={`bookmark-btn ${recipe.bookmarked ? "bookmarked" : ""}`}
                         onClick={handleBookmark}
-                        disabled={bookmarkLoading}
-                    >
+                        disabled={bookmarkLoading}>
                         {bookmarkLoading
                             ? "Processing..."
                             : recipe.bookmarked
@@ -77,7 +76,7 @@ export default function RecipePage() {
 
             <div className="ingredients-section">
                 <h2>Ingredients</h2>
-                <ul className="ingredients-list">
+                <ul className="recipe-details-ingredients-list">
                     {recipe.ingredients.map(ing => (
                         <li key={ing._id} className="ingredient-item">{ing.name}</li>
                     ))}

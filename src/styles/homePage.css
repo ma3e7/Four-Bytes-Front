@@ -8,13 +8,17 @@
 .home-title {
     text-align: center;
     margin-bottom: 20px;
+    color: #7C444F; 
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
 }
 
 .recipe-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    width: fit-content;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+    gap: 30px; 
+    width: 100%;
+    max-width: 1200px;
     justify-content: center;
-    align-items: center;
 }

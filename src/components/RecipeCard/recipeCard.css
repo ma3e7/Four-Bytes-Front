@@ -1,14 +1,13 @@
 .recipe-card {
     width: 260px;
     height: 240px;
-    /* manja kartica */
     position: relative;
     border-radius: 12px;
     overflow: hidden;
     background: white;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     cursor: pointer;
-    transition: transform .2s ease;
+    transition: transform 0.2s ease;
 }
 
 .recipe-card:hover {
@@ -17,7 +16,7 @@
 
 .recipe-image {
     width: 100%;
-    height: 150px;
+    height: 100%;
     background-size: cover;
     background-position: center;
     position: relative;
@@ -25,49 +24,56 @@
 
 .recipe-name {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    top: 8px;
+    left: 8px;
+    right: auto;
     background: rgba(0, 0, 0, 0.5);
     padding: 6px;
     color: white;
     font-weight: bold;
     font-size: 14px;
-}
-
-.recipe-info {
-    padding: 5px;
+    z-index: 15;
+    border-radius: 4px;
+    max-width: 55%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .rating-time {
+    position: absolute;
+    top: 8px;
+    right: 8px;
     display: flex;
-    justify-content: space-between;
+    gap: 8px;
     font-size: 13px;
     font-weight: bold;
+    color: white;
+    z-index: 15;
 }
 
-/* -------------------------- */
-/*            OVERLAY         */
-/* -------------------------- */
+.rating-time span {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 3px 6px;
+    border-radius: 4px;
+}
 
 .ingredients-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-
-    background: rgba(89, 220, 49, 0.97);
+    background: #E16A54;
     padding: 10px;
     box-sizing: border-box;
+    z-index: 5;
+    color: white;
 
-    /* Početno pokazuje samo jedan red */
     max-height: 60px;
     overflow: hidden;
-
-    transition: max-height .35s ease;
+    transition: max-height 0.35s ease;
 }
 
-/* Kada hoverneš: pokaže sve sastojke */
 .recipe-card:hover .ingredients-overlay {
     max-height: 200px;
 }
@@ -75,6 +81,7 @@
 .ingredients-overlay h4 {
     margin: 0 0 5px;
     font-size: 14px;
+    color: white;
 }
 
 .ingredients-list {
@@ -85,8 +92,14 @@
 }
 
 .ingredients-list span {
-    background: #f1f1f1;
+    background: #F39E60;
     padding: 4px 7px;
     border-radius: 6px;
     font-size: 11px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    max-width: calc(100% - 12px);
 }

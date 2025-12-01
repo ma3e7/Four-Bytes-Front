@@ -14,11 +14,16 @@ export default function NavbarComponent({ openSignIn, openSignUp, isLoggedIn, re
     return (
         <nav className="navbar">
             <div className="left">
+                {!isLoggedIn && (
+                    <Link to="/" className="logo-left">Four Bytes</Link>
+                )}
                 {isLoggedIn && <Link to="/bookmarks">Bookmarks</Link>}
             </div>
 
             <div className="center">
-                <Link to="/">Four Bytes</Link>
+                {isLoggedIn && (
+                    <Link to="/">Four Bytes</Link>
+                )}
             </div>
 
             <div className="right">
