@@ -8,8 +8,8 @@
 
 .paginator button {
     padding: 8px 14px;
-    background: #7C444F; 
-    color: white; 
+    background: #7C444F;
+    color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -18,16 +18,16 @@
 }
 
 .paginator button:hover:not(.active) {
-    background: #9F5255; 
+    background: #9F5255;
 }
 
 .paginator button.active {
-    background: #E16A54; 
+    background: #E16A54;
     color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .paginator button.active:hover {
-    background: #F39E60;    
+    background: #F39E60;
     color: #333;
 }

@@ -18,9 +18,9 @@ export default function SignUpComponent({ closeModal, openSignIn, refreshUser })
 
         try {
             await authService.register(username, password);
-            refreshUser(); 
+            refreshUser();
             closeModal();
-            openSignIn();   
+            openSignIn();
         } catch (err) {
             setError(err.message);
         }
